@@ -1,11 +1,11 @@
 
-let orders = [];
-let suppliers = [];
-let items = [];
-let budgets = [];
-let users = [{'username':'admin','password':'password','role':'Admin'}];
-let instituteDetails = {'name':'','address':'','phone':'','email':'','vat':'','logoData':''};
-let rolePermissions = {'Editor':{'placeOrder':true,'editOrder':true,'deleteOrder':true,'addReceipt':true,'addPayment':true},'Viewer':{'placeOrder':false,'editOrder':false,'deleteOrder':false,'addReceipt':false,'addPayment':false}};
+let orders = JSON.parse(localStorage.getItem('procurement_orders') || 'null') || [];
+let suppliers = JSON.parse(localStorage.getItem('procurement_suppliers') || 'null') || [];
+let items = JSON.parse(localStorage.getItem('procurement_items') || 'null') || [];
+let budgets = JSON.parse(localStorage.getItem('procurement_budgets') || 'null') || [];
+let users = JSON.parse(localStorage.getItem('procurement_users') || 'null') || [{'username':'admin','password':'password','role':'Admin'}];
+let instituteDetails = JSON.parse(localStorage.getItem('procurement_institute') || 'null') || {'name':'','address':'','phone':'','email':'','vat':'','logoData':''};
+let rolePermissions = JSON.parse(localStorage.getItem('procurement_permissions') || 'null') || {'Editor':{'placeOrder':true,'editOrder':true,'deleteOrder':true,'addReceipt':true,'addPayment':true},'Viewer':{'placeOrder':false,'editOrder':false,'deleteOrder':false,'addReceipt':false,'addPayment':false}};
 let currentSession = null;
 function saveState(){
     localStorage.setItem('procurement_orders', JSON.stringify(orders));
