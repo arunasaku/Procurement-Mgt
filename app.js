@@ -258,7 +258,7 @@ handleLogin = function(e) {
     e.preventDefault();
     const username = document.getElementById('loginUsername').value.trim();
     const passwordField = document.getElementById('loginPassword').value;
-    const user = users.find(u => u.username === username && u.password === passwordField);
+    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === passwordField);
     
     if (user) {
         currentSession = { username: user.username, role: user.role, permissions: user.permissions || {} };
