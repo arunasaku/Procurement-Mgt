@@ -842,21 +842,6 @@
     </div>
 
     <script>
-        // Check if localStorage is accessible (Chrome blocks it if third-party cookies are blocked)
-        try {
-            localStorage.getItem('test');
-        } catch (e) {
-            document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: red; font-family: sans-serif;">' +
-                '<h2>Storage Access Error</h2>' +
-                '<p>Google Chrome is blocking access to Local Storage for local files.</p>' +
-                '<p>To fix this, either:</p>' +
-                '<ul style="display: inline-block; text-align: left;">' +
-                '<li>Use the provided <b>.exe</b> Windows application instead.</li>' +
-                '<li>Go to Chrome Settings -> Cookies and other site data -> Allow all cookies.</li>' +
-                '<li>Run the app via a local web server (like Live Server or http-server) rather than opening the file directly.</li>' +
-                '</ul></div>';
-        }
-
         function copyMachineId(btn) {
             if (typeof currentMachineId !== 'undefined' && currentMachineId) {
                 navigator.clipboard.writeText(currentMachineId).then(() => {
@@ -880,6 +865,24 @@
             }
         }, 500);
     </script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyVnB3vNq3AJ92rxuCitX1Mz7JlY0KVAA",
+            authDomain: "procurement-system-gps.firebaseapp.com",
+            databaseURL: "https://procurement-system-gps-default-rtdb.firebaseio.com",
+            projectId: "procurement-system-gps",
+            storageBucket: "procurement-system-gps.firebasestorage.app",
+            messagingSenderId: "8065082434",
+            appId: "1:8065082434:web:467766b614e27ab199f9db"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+    </script>
+
     <script src="app.js?v=10"></script>
     <script>
         // Override populatePaymentOrderDropdown from app.js to only show orders that have GRNs
