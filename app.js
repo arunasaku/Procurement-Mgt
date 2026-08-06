@@ -286,6 +286,12 @@ handleLogin = function(e) {
         
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('appContainer').style.display = 'flex';
+        
+        // Update User Profile Display
+        document.getElementById('userNameDisplay').textContent = currentSession.username;
+        document.getElementById('userRoleDisplay').textContent = currentSession.role;
+        document.getElementById('userInitials').textContent = currentSession.username.charAt(0).toUpperCase();
+        
         renderAll();
     } else {
         document.getElementById('loginError').style.display = 'block';
