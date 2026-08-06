@@ -347,3 +347,114 @@ function syncItemVotes() {
         });
     }
 }
+
+renderReceipts = function() {
+    const container = document.getElementById('receipts-container');
+    let receiptsList = [];
+    
+    orders.forEach(order => {
+        (order.receipts || []).forEach(receipt => {
+            const itemsList = order.items || [];
+            const orderItem = itemsList[receipt.itemIndex];
+            const itemDef = orderItem ? items.find(i => i.id === orderItem.itemId) : null;
+            receiptsList.push({
+                orderId: order.id,
+                orderNumber: order.orderNumber,
+                itemName: itemDef ? itemDef.name : 'Unknown',
+                ...receipt
+            });
+        });
+    });
+    
+    if (receiptsList.length === 0) {
+        container.innerHTML = '<tr><td colspan="9" class="empty-state">No receipts found.</td></tr>';
+        return;
+    }
+    
+    container.innerHTML = receiptsList.map(rec => {
+        return `
+            <tr>
+                <td>#${rec.orderNumber}</td>
+                <td>${rec.grnNo}</td>
+                <td>${rec.grnDate}</td>
+                <td>${rec.billNo}</td>
+                <td>${rec.qty}</td>
+                <td>${formatCurrency(rec.valueExVat || 0)}</td>
+                <td>${formatCurrency(rec.vatAmt || 0)}</td>
+                <td><strong>${formatCurrency(rec.totalVal || 0)}</strong></td>
+                <td>
+                    <button class="btn-icon" onclick="openEditReceiptModal('${rec.orderId}', '${rec.id}')" title="Edit">✏️</button>
+                    <button class="btn-icon" onclick="deleteReceipt('${rec.orderId}', '${rec.id}')" title="Delete" style="color: var(--danger);">🗑️</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+};
+
+function openEditReceiptModal(orderId, receiptId) {
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return;
+    const receipt = (order.receipts || []).find(r => r.id === receiptId);
+    if (!receipt) return;
+    
+    document.getElementById('editReceiptOrderId').value = orderId;
+    document.getElementById('editReceiptId').value = receiptId;
+    document.getElementById('editReceiptGrnNo').value = receipt.grnNo || '';
+    document.getElementById('editReceiptGrnDate').value = receipt.grnDate || '';
+    document.getElementById('editReceiptBillNo').value = receipt.billNo || '';
+    document.getElementById('editReceiptQty').value = receipt.qty || 0;
+    
+    document.getElementById('editReceiptModal').style.display = 'flex';
+}
+
+function handleEditReceiptSubmit(e) {
+    e.preventDefault();
+    const orderId = document.getElementById('editReceiptOrderId').value;
+    const receiptId = document.getElementById('editReceiptId').value;
+    
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return;
+    
+    const receiptIndex = (order.receipts || []).findIndex(r => r.id === receiptId);
+    if (receiptIndex === -1) return;
+    const receipt = order.receipts[receiptIndex];
+    
+    const newQty = parseFloat(document.getElementById('editReceiptQty').value) || 0;
+    if (newQty < 0) return alert('Quantity cannot be negative');
+    
+    const orderItem = order.items[receipt.itemIndex];
+    const unitVal = orderItem.unitVal || 0;
+    
+    const exVat = newQty * unitVal;
+    const vatRate = orderItem.vatApplicable ? (parseFloat(order.vat) || 0) : 0;
+    const vatAmt = exVat * (vatRate / 100);
+    const totalVal = exVat + vatAmt;
+    
+    order.receipts[receiptIndex] = {
+        ...receipt,
+        grnNo: document.getElementById('editReceiptGrnNo').value,
+        grnDate: document.getElementById('editReceiptGrnDate').value,
+        billNo: document.getElementById('editReceiptBillNo').value,
+        qty: newQty,
+        valueExVat: exVat,
+        vatAmt: vatAmt,
+        totalVal: totalVal
+    };
+    
+    saveState();
+    closeModals();
+    renderAll();
+}
+
+function deleteReceipt(orderId, receiptId) {
+    if (!confirm('Are you sure you want to delete this receipt?')) return;
+    
+    const order = orders.find(o => o.id === orderId);
+    if (!order || !order.receipts) return;
+    
+    order.receipts = order.receipts.filter(r => r.id !== receiptId);
+    
+    saveState();
+    renderAll();
+}
+
